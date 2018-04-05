@@ -162,5 +162,6 @@ int main(){
         
         movePlayer(strMaze, &tPlayerPos, cInput);
     }
+    //github test
     return 0;
 }
