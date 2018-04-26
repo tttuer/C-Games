@@ -6,9 +6,10 @@
 //  Copyright © 2018 Jayyoung Yang. All rights reserved.
 //
 
-#import "myconio_mac.h"
+#include "myconio_mac.h"
 #include <iostream>
 #include <time.h>
+#include <fstream>
 
 using namespace std;
 
@@ -43,34 +44,143 @@ typedef struct _tagPlayer {
 
 void setMaze(char maze[20][20], PPLAYER pPlayer, PPoint pStartPos,
              PPoint pEndPos) {
-  pStartPos->x = 0;
-  pStartPos->y = 0;
-
-  pEndPos->x = 19;
-  pEndPos->y = 19;
-
-  pPlayer->tPos = *pStartPos;
-
-  strcpy(maze[0], "21000000000000000000");
-  strcpy(maze[1], "01111111111100000000");
-  strcpy(maze[2], "00100010000111111100");
-  strcpy(maze[3], "01100010000000000100");
-  strcpy(maze[4], "01000011110001111100");
-  strcpy(maze[5], "01000000001111000000");
-  strcpy(maze[6], "01100000001000000000");
-  strcpy(maze[7], "00100000001111111000");
-  strcpy(maze[8], "00001110000000001000");
-  strcpy(maze[9], "01111011111111111000");
-  strcpy(maze[10], "01000000000000000000");
-  strcpy(maze[11], "01111100111111100000");
-  strcpy(maze[12], "00000111100000111110");
-  strcpy(maze[13], "01111100000000000010");
-  strcpy(maze[14], "01000000001111111110");
-  strcpy(maze[15], "01111110011000000000");
-  strcpy(maze[16], "01000010010000000000");
-  strcpy(maze[17], "01111110011111000000");
-  strcpy(maze[18], "01000000000001100000");
-  strcpy(maze[19], "11000000000000111113");
+    // 파일을 읽어와서 미로 목록을 만든다.
+    // FILE *pFile;
+    ifstream ifs;
+    
+    // 응용 프로그램으로 만들어서 실행시키는 경우
+    // 파일을 읽는 경로는 mac에서는 /user/자신의 계정이름/ 이다.
+    // 따라서 그 경로에 이 파일이 위치해 있어야 한다. 
+    // 하지만 터미널에서 실행시키면 그 폴더에 위치해 있는 파일을 읽는다.
+    ifs.open("MazeList.txt");
+    
+    char **pMazeList = NULL;
+    
+    if (ifs)
+    {
+        char cCount;
+        
+        // fread(&cCount, 1, 1, pFile);
+        ifs.get(cCount);
+        
+        int iMazeCount = atoi(&cCount);
+        
+        // 한번 더 읽어와야 한다. 그 이유는 개행을 했기 때문이다. \n을 없애기 위해서.
+        // fread(&cCount, 1, 1, pFile);
+        ifs.get(cCount);
+        
+        // char* 배열을 미로 갯수만큼 할당한다.
+        pMazeList = new char *[iMazeCount];
+        
+        for (int i = 0; i < iMazeCount; i++)
+        {
+            int iNameCount = 0;
+            
+            // 현재 미로의 파일 이름을 저장할 배열을 256개 할당
+            // 해둔다. 미리 넉넉하게 할당해둔 것이다.
+            pMazeList[i] = new char[256];
+            
+            while (true)
+            {
+                // fread(&cCount, 1, 1, pFile);
+                ifs.get(cCount);
+                
+                if (cCount != '\n')
+                {
+                    pMazeList[i][iNameCount++] = cCount;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            // 파일 이름을 모두 읽었다면 문자열의 마지막에 0을
+            // 넣어서 이 문자열을 끝을 알려준다.
+            pMazeList[i][iNameCount] = 0;
+        }
+        // fclose(pFile);
+        ifs.close();
+        
+        // 읽을 파일 목록이 만들어졌으므로 각 파일중 하나를 선택해서
+        // 미로를 읽어와서 설정한다.
+        for (int i = 0; i < iMazeCount; i++)
+        {
+            cout << i + 1 << ". " << pMazeList[i] << endl;
+        }
+        
+        cout << "Select a maze: ";
+        int iSelect;
+        cin >> iSelect;
+        
+        // 선택한 미로 파일을 읽는다.
+        // pFile = fopen(strcat(mazePath, pMazeList[iSelect - 1]), "rt");
+        ifs.open(pMazeList[iSelect - 1]);
+        
+        if (ifs)
+        {
+            // 미로의 세로 줄 수 만큼 반복하며 각 줄 별로 읽어온다.
+            for (int i = 0; i < 20; i++)
+            {
+                // fread(maze[i], 1, 20, pFile);
+                ifs >> maze[i];
+                
+                // 현재 줄의 미로를 검사하여 시작점, 혹은
+                // 도착점이 있는지 검사한다.
+                for (int j = 0; j < 20; j++)
+                {
+                    // 시작점일 경우
+                    if (maze[i][j] == '2')
+                    {
+                        pStartPos->x = j;
+                        pStartPos->y = i;
+                        
+                        pPlayer->tPos = *pStartPos;
+                    }
+                    // 도착점일 경우
+                    else if (maze[i][j] == '3')
+                    {
+                        pEndPos->x = j;
+                        pEndPos->y = i;
+                    }
+                }
+                
+                // 개행 문자를 읽어온다.
+                // fread(&cCount, 1, 1, pFile);
+                ifs.get(cCount);
+            }
+            // fclose(pFile);
+            ifs.close();
+        }
+    }
+    // pStartPos->x = 0;
+    // pStartPos->y = 0;
+    
+    // pEndPos->x = 19;
+    // pEndPos->y = 19;
+    
+    // *pPlayerPos = *pStartPos;
+    
+    // strcpy(maze[0], "21000000000000000000");
+    // strcpy(maze[1], "01111111111100000000");
+    // strcpy(maze[2], "00100010000111111100");
+    // strcpy(maze[3], "01100010000000000100");
+    // strcpy(maze[4], "01000011110001111100");
+    // strcpy(maze[5], "01000000001111000000");
+    // strcpy(maze[6], "01100000001000000000");
+    // strcpy(maze[7], "00100000001111111000");
+    // strcpy(maze[8], "00001110000000001000");
+    // strcpy(maze[9], "01111011111111111000");
+    // strcpy(maze[10], "01000000000000000000");
+    // strcpy(maze[11], "01111100111111100000");
+    // strcpy(maze[12], "00000111100000111110");
+    // strcpy(maze[13], "01111100000000000010");
+    // strcpy(maze[14], "01000000001111111110");
+    // strcpy(maze[15], "01111110011000000000");
+    // strcpy(maze[16], "01000010010000000000");
+    // strcpy(maze[17], "01111110011111000000");
+    // strcpy(maze[18], "01000000000001100000");
+    // strcpy(maze[19], "11000000000000111113");
 }
 
 void output(char maze[20][20], PPLAYER pPlayer) {
