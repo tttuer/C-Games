@@ -30,13 +30,15 @@ int main()
 	_tagItem tStoreWeapon[STORE_WEAPON_MAX] = {};
 	_tagItem tStoreArmor[STORE_ARMOR_MAX] = {};
 
-	tStoreWeapon[0] = createItem("Wooden sword", IT_WEAPON, 5, 10, 1000, 500, "sword made with wood");
-	tStoreWeapon[1] = createItem("Long bow", IT_WEAPON, 20, 40, 7000, 3500, "Bow for the beginner");
-	tStoreWeapon[2] = createItem("Wand", IT_WEAPON, 90, 150, 30000, 15000, "Wand for beginner");
+	// tStoreWeapon[0] = createItem("Wooden sword", IT_WEAPON, 5, 10, 1000, 500, "sword made with wood");
+	// tStoreWeapon[1] = createItem("Long bow", IT_WEAPON, 20, 40, 7000, 3500, "Bow for the beginner");
+	// tStoreWeapon[2] = createItem("Wand", IT_WEAPON, 90, 150, 30000, 15000, "Wand for beginner");
 
-	tStoreArmor[0] = createItem("Cloth armor", IT_ARMOR, 2, 5, 1000, 500, "Armor made with cloth");
-	tStoreArmor[1] = createItem("Leather armor", IT_ARMOR, 10, 20, 7000, 3500, "Armor made with leather");
-	tStoreArmor[2] = createItem("Plate armor", IT_ARMOR, 70, 90, 30000, 15000, "Armor made with plate");
+	// tStoreArmor[0] = createItem("Cloth armor", IT_ARMOR, 2, 5, 1000, 500, "Armor made with cloth");
+	// tStoreArmor[1] = createItem("Leather armor", IT_ARMOR, 10, 20, 7000, 3500, "Armor made with leather");
+	// tStoreArmor[2] = createItem("Plate armor", IT_ARMOR, 70, 90, 30000, 15000, "Armor made with plate");
+	loadStore(tStoreWeapon, tStoreArmor);
+
 	bool bLoop = true;
 
 	while (bLoop)
